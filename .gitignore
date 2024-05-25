@@ -30,3 +30,21 @@
 *.exe
 *.out
 *.app
+
+# Binary Directories
+[Oo]ut/
+[Bb]uild/
+[Bb]in/
+
+# IDE Files and Folders
+compile_commands.json
+.vs
+.vscode
+.cache
+.idea
+
+# Platform Specific Files
+.DS_Store
+
+# User Specifc Files
+CMakeUsersPresets.json
