@@ -79,7 +79,6 @@
     },
     {
       "name": "OSX-LLVM-Release",
-      "hidden": true,
       "inherits": [
         "OSX",
         "Release",
@@ -91,7 +90,6 @@
     },
     {
       "name": "OSX-GCC-Debug",
-      "hidden": true,
       "inherits": [
         "OSX",
         "Debug",
@@ -103,7 +101,6 @@
     },
     {
       "name": "OSX-GCC-Release",
-      "hidden": true,
       "inherits": [
         "OSX",
         "Release",
@@ -151,7 +148,6 @@
     },
     {
       "name": "Linux-GCC-Debug",
-      "hidden": true,
       "inherits": [
         "Linux",
         "Debug",
@@ -163,7 +159,6 @@
     },
     {
       "name": "Linux-GCC-Release",
-      "hidden": true,
       "inherits": [
         "Linux",
         "Release",
@@ -175,7 +170,6 @@
     },
     {
       "name": "Linux-LLVM-Debug",
-      "hidden": true,
       "inherits": [
         "Linux",
         "Debug",
@@ -187,7 +181,6 @@
     },
     {
       "name": "Linux-LLVM-Release",
-      "hidden": true,
       "inherits": [
         "Linux",
         "Release",
