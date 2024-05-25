@@ -1,3 +1,4 @@
+[![Build Status](https://dev.azure.com/natecheadle/CMakeCPPTemplate/_apis/build/status%2Fnatecheadle.CMakeCPPTemplate?branchName=main)](https://dev.azure.com/natecheadle/CMakeCPPTemplate/_build/latest?definitionId=2&branchName=main)
 # Introduction
 This is a template project for starting a new cmake project. 
 
