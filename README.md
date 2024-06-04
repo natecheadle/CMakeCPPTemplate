@@ -47,6 +47,31 @@ It includes the following:
         "MyPC"
       ],
       "binaryDir": "${sourceDir}/out/build/MSVC/Release"
+    },
+    {
+      "name": "MyMac",
+      "toolchainFile": "/home/user/repos/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "hidden": true
+    },
+    {
+      "name": "OSX-LLVM-Debug-MyMac",
+      "inherits": ["OSX-LLVM-Debug", "MyMac"],
+      "binaryDir": "${sourceDir}/out/build/LLVM/Debug"
+    },
+    {
+      "name": "OSX-LLVM-Release-MyMac",
+      "inherits": ["OSX-LLVM-Release", "MyMac"],
+      "binaryDir": "${sourceDir}/out/build/LLVM/Release"
+    },
+    {
+      "name": "OSX-GCC-Debug-MyMac",
+      "inherits": ["OSX-GCC-Debug", "MyMac"],
+      "binaryDir": "${sourceDir}/out/build/GCC/Debug"
+    },
+    {
+      "name": "OSX-GCC-Release-MyMac",
+      "inherits": ["OSX-GCC-Release", "MyMac"],
+      "binaryDir": "${sourceDir}/out/build/GCC/Release"
     }
   ]
 }
