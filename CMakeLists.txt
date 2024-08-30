@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.21)
 
 project(my-project)
 
+if(${BUILD_COVERAGE})
+    SET(CLANG_COVERAGE_COMPILE_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COVERAGE_COMPILE_FLAGS}")
+endif()
+
 execute_process(
   COMMAND
     ${CMAKE_COMMAND} -E create_symlink

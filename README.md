@@ -28,14 +28,12 @@ It includes the following:
     {
       "name": "MyPC",
       "hidden": true,
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      }
+      "toolchainFile": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
     },
     {
       "name": "Windows-MSVC-Debug-MyPC",
       "inherits": [
-        "Windows-MSVC-Debug",
+        "Windows-MSVC-x64-Debug",
         "MyPC"
       ],
       "binaryDir": "${sourceDir}/out/build/MSVC/Debug"
@@ -43,7 +41,7 @@ It includes the following:
     {
       "name": "Windows-MSVC-Release-MyPC",
       "inherits": [
-        "Windows-MSVC-Release",
+        "Windows-MSVC-x64-Release",
         "MyPC"
       ],
       "binaryDir": "${sourceDir}/out/build/MSVC/Release"
@@ -64,13 +62,18 @@ It includes the following:
       "binaryDir": "${sourceDir}/out/build/LLVM/Release"
     },
     {
-      "name": "OSX-GCC-Debug-MyMac",
-      "inherits": ["OSX-GCC-Debug", "MyMac"],
+      "name": "MyUbuntu",
+      "toolchainFile": "/home/user/repos/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "hidden": true
+    },
+    {
+      "name": "Linux-GCC-Debug-MyUbuntu",
+      "inherits": ["Linux-GCC-Debug", "MyUbuntu"],
       "binaryDir": "${sourceDir}/out/build/GCC/Debug"
     },
     {
-      "name": "OSX-GCC-Release-MyMac",
-      "inherits": ["OSX-GCC-Release", "MyMac"],
+      "name": "Linux-GCC-Release-MyUbuntu",
+      "inherits": ["Linux-GCC-Release", "MyUbuntu"],
       "binaryDir": "${sourceDir}/out/build/GCC/Release"
     }
   ]
