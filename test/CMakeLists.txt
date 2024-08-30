@@ -13,3 +13,17 @@ find_package(GTest CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest my-lib)
 
 gtest_add_tests(TARGET ${PROJECT_NAME})
+
+if(WIN32)
+    install(
+      TARGETS ${PROJECT_NAME}
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION bin)
+else()
+    install(
+      TARGETS ${PROJECT_NAME}
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib)
+endif()
