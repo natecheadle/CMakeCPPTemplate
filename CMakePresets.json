@@ -75,6 +75,22 @@
       }
     },
     {
+      "name": "x86",
+      "hidden": true,
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "x64",
+      "hidden": true,
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
       "name": "OSX-LLVM-Debug",
       "hidden": true,
       "inherits": [
@@ -130,19 +146,39 @@
       }
     },
     {
-      "name": "Windows-MSVC-Debug",
+      "name": "Windows-MSVC-x64-Debug",
       "inherits": [
         "Windows",
         "MSVC",
-        "Debug"
+        "Debug",
+        "x64"
       ]
     },
     {
-      "name": "Windows-MSVC-Release",
+      "name": "Windows-MSVC-x64-Release",
       "inherits": [
         "Windows",
         "MSVC",
-        "Release"
+        "Release",
+        "x64"
+      ]
+    },
+    {
+      "name": "Windows-MSVC-x86-Debug",
+      "inherits": [
+        "Windows",
+        "MSVC",
+        "Debug",
+        "x86"
+      ]
+    },
+    {
+      "name": "Windows-MSVC-x86-Release",
+      "inherits": [
+        "Windows",
+        "MSVC",
+        "Release",
+        "x86"
       ]
     },
     {
