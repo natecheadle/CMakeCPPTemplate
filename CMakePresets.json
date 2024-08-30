@@ -32,6 +32,13 @@
       }
     },
     {
+      "name": "CodeCoverage",
+      "hidden": true,
+      "cacheVariables": {
+        "BUILD_COVERAGE": true
+      }
+    },
+    {
       "name": "Debug",
       "hidden": true,
       "cacheVariables": {
