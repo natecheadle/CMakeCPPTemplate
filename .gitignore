@@ -48,3 +48,4 @@ compile_commands.json
 
 # User Specifc Files
 CMakeUserPresets.json
+*.user
