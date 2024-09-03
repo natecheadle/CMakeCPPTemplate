@@ -2,8 +2,11 @@ trigger:
   - main
 
 variables:
+- name: VCPKG_NUGET
+  value: https://pkgs.dev.azure.com/natecheadle/CMakeCPPTemplate/_packaging/PIPELINE_CACHE/nuget/v3/index.json
+
 - name: VCPKG_BINARY_SOURCES
-  value: 'clear;nuget,https://pkgs.dev.azure.com/natecheadle/CMakeCPPTemplate/_packaging/PIPELINE_CACHE/nuget/v3/index.json,readwrite'
+  value: 'clear;nuget,$(VCPKG_NUGET),readwrite'
 
 - name: GTEST_OUTPUT
   value: 'xml:$(System.DefaultWorkingDirectory)/TEST-REPORT.xml'
@@ -62,20 +65,18 @@ stages:
 
     strategy:
       matrix:
-        DEBUG_13:
-          gccVersion: 13
+        DEBUG_12:
+          gccVersion: 12
           cmakePreset: Linux-GCC-Debug
 
-        RELEASE_13:
-          gccVersion: 13
+        RELEASE_12:
+          gccVersion: 12
           cmakePreset: Linux-GCC-Release
 
     steps:
-    - script: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config gcc-$(gccVersion) g++-$(gccVersion)
-      displayName: "Install Dependencies"
+    - template: templates/install-dependencies.yml
+      parameters:
+        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
 
     - script: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$(gccVersion) 10
@@ -96,23 +97,21 @@ stages:
     pool:
       vmImage: ubuntu-latest
 
+    
     strategy:
       matrix:
-        DEBUG_17:
-          llvmVersion: 17
+        DEBUG_15:
+          llvmVersion: 15
           cmakePreset: Linux-LLVM-Debug
 
-        RELEASE_17:
-          llvmVersion: 17
+        RELEASE_15:
+          llvmVersion: 15
           cmakePreset: Linux-LLVM-Release
 
     steps:
-    - script: |
-        sudo apt-get install ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh $(llvmVersion)
-      displayName: "Install Dependencies"
+    - template: templates/install-dependencies.yml
+      parameters:
+        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
 
     - script: |
         sudo rm /usr/bin/clang
@@ -134,23 +133,22 @@ stages:
     variables:
     - name: CODE_COVERAGE_NAME
       value: 'code_coverage'
+
     steps:
-    - script: |
-        sudo apt-get install ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh 17
-      displayName: "Install Dependencies"
+   
+    - template: templates/install-dependencies.yml
+      parameters:
+        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
 
     - script: |
         sudo rm /usr/bin/clang
         sudo rm /usr/bin/clang++
         sudo rm /usr/bin/llvm-profdata
         sudo rm /usr/bin/llvm-cov
-        sudo ln -s /usr/bin/clang-17 /usr/bin/clang
-        sudo ln -s /usr/bin/clang++-17 /usr/bin/clang++
-        sudo ln -s /usr/bin/llvm-profdata-17 /usr/bin/llvm-profdata
-        sudo ln -s /usr/bin/llvm-cov-17 /usr/bin/llvm-cov
+        sudo ln -s /usr/bin/clang-15 /usr/bin/clang
+        sudo ln -s /usr/bin/clang++-15 /usr/bin/clang++
+        sudo ln -s /usr/bin/llvm-profdata-15 /usr/bin/llvm-profdata
+        sudo ln -s /usr/bin/llvm-cov-15 /usr/bin/llvm-cov
       displayName: "Configure Compiler Version"
 
     - template: templates/build-app.yml

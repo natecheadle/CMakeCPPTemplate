@@ -10,7 +10,7 @@ steps:
   displayName: "Configure API Key"
   inputs:
     command: 'custom'
-    arguments: setapikey "AzureDevops" -source "https://pkgs.dev.azure.com/natecheadle/CMakeCPPTemplate/_packaging/PIPELINE_CACHE/nuget/v3/index.json"
+    arguments: setapikey "AzureDevops" -source $(VCPKG_NUGET)
 
 - task: NuGetAuthenticate@1
   displayName: "Autheticate to Artifact Feed"
