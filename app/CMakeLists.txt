@@ -6,18 +6,18 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(${PROJECT_NAME} "main.cpp")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE my-lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE string-lib)
 
 if(WIN32)
-    install(
-      TARGETS ${PROJECT_NAME}
-      RUNTIME DESTINATION bin
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION bin)
+  install(
+    TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION bin)
 else()
-    install(
-      TARGETS ${PROJECT_NAME}
-      RUNTIME DESTINATION bin
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION lib)
+  install(
+    TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
 endif()

@@ -26,6 +26,16 @@ steps:
   inputs:
     workingDirectory: '.' 
     cmakeArgs: --build $(Build.BinariesDirectory) 
+
+- script: ctest --test-dir $(Build.BinariesDirectory) -O test-results.txt
+  displayName: "Test All"
+
+- task: PublishTestResults@2
+  displayName: "Publish Test Results"
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '$(Build.BinariesDirectory)/**/*TEST-*.xml' 
+
     
 - task: CMake@1 
   displayName: "Install All"

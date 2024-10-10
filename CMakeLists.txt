@@ -3,8 +3,9 @@ cmake_minimum_required(VERSION 3.21)
 project(my-project)
 
 if(${BUILD_COVERAGE})
-    SET(CLANG_COVERAGE_COMPILE_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COVERAGE_COMPILE_FLAGS}")
+  set(CLANG_COVERAGE_COMPILE_FLAGS
+      "-fprofile-instr-generate -fcoverage-mapping")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COVERAGE_COMPILE_FLAGS}")
 endif()
 
 execute_process(
@@ -18,5 +19,4 @@ enable_testing()
 add_compile_definitions(PUBLIC $<$<CONFIG:Debug>:DEBUG>)
 
 add_subdirectory("app")
-add_subdirectory("lib")
-add_subdirectory("test")
+add_subdirectory("libs")
