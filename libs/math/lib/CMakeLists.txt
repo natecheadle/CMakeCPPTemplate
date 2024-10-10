@@ -1,15 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 
-include(CopyDlls)
-project(my-app)
-
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} "main.cpp")
+add_library(${PROJECT_NAME} SHARED "math_operation.cpp")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE my-string)
-
-copy_dlls(${PROJECT_NAME})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if(WIN32)
   install(

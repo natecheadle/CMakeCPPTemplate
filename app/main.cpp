@@ -1,9 +1,9 @@
-#include <string_lib.h>
+#include <string_operation.h>
 
 #include <iostream>
 
 int main() {
-  std::cout << my::lib::to_upper("Hello Upper Case World") << std::endl;
+  std::cout << my::string::ToUpper("Hello Upper Case World") << std::endl;
 
   return 0;
 }
