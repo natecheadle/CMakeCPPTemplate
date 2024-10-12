@@ -1,4 +1,6 @@
 [![Build Status](https://dev.azure.com/natecheadle/CMakeCPPTemplate/_apis/build/status%2Fnatecheadle.CMakeCPPTemplate?branchName=main)](https://dev.azure.com/natecheadle/CMakeCPPTemplate/_build/latest?definitionId=2&branchName=main)
+![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/natecheadle/CMakeCPPTemplate/2)
+
 # Introduction
 This is a template project for starting a new cmake project. 
 
