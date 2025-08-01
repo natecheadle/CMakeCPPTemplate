@@ -13,7 +13,7 @@ stages:
   jobs:
   - job: WINDOWS_MSVC
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2025
     strategy:
       matrix:
         DEBUG_X86:
@@ -50,16 +50,16 @@ stages:
 
   - job: LINUX_GCC
     pool:
-      vmImage: ubuntu-latest
+      vmImage: ubuntu-24.04
 
     strategy:
       matrix:
-        DEBUG_12:
-          gccVersion: 12
+        DEBUG_14:
+          gccVersion: 14
           cmakePreset: Linux-GCC-Debug
 
-        RELEASE_12:
-          gccVersion: 12
+        RELEASE_14:
+          gccVersion: 14
           cmakePreset: Linux-GCC-Release
 
     steps:
@@ -79,35 +79,33 @@ stages:
 
   - job: LINUX_LLVM
     pool:
-      vmImage: ubuntu-latest
+      vmImage: ubuntu-24.04
 
     strategy:
       matrix:
-        DEBUG_15:
-          llvmVersion: 15
+        DEBUG_18:
+          llvmVersion: 18
           cmakePreset: Linux-LLVM-Debug
           coverage: false
 
-        RELEASE_15:
-          llvmVersion: 15
+        RELEASE_18:
+          llvmVersion: 18
           cmakePreset: Linux-LLVM-Release
           coverage: false
 
-        COVERAGE_15:
-          llvmVersion: 15
+        COVERAGE_18:
+          llvmVersion: 18
           cmakePreset: Linux-LLVM-Coverage
           coverage: true
 
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build pkg-config mono-devel'
+        dependencies: 'ninja-build pkg-config mono-devel llvm-18'
 
     - script: |
         sudo rm /usr/bin/clang
         sudo rm /usr/bin/clang++
-        sudo rm /usr/bin/llvm-profdata
-        sudo rm /usr/bin/llvm-cov
         sudo ln -s /usr/bin/clang-$(llvmVersion) /usr/bin/clang
         sudo ln -s /usr/bin/clang++-$(llvmVersion) /usr/bin/clang++
         sudo ln -s /usr/bin/llvm-profdata-$(llvmVersion) /usr/bin/llvm-profdata
