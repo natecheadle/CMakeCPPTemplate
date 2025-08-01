@@ -68,7 +68,7 @@ stages:
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build pkg-config'
+        dependencies: 'ninja-build pkg-config mono-devel'
 
     - script: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$(gccVersion) 10
@@ -89,31 +89,35 @@ stages:
         DEBUG_15:
           llvmVersion: 15
           cmakePreset: Linux-LLVM-Debug
+          coverage: false
 
         RELEASE_15:
           llvmVersion: 15
           cmakePreset: Linux-LLVM-Release
+          coverage: false
 
         COVERAGE_15:
           llvmVersion: 15
           cmakePreset: Linux-LLVM-Coverage
+          coverage: true
 
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build pkg-config'
+        dependencies: 'ninja-build pkg-config mono-devel'
 
     - script: |
         sudo rm /usr/bin/clang
         sudo rm /usr/bin/clang++
         sudo rm /usr/bin/llvm-profdata
         sudo rm /usr/bin/llvm-cov
-        sudo ln -s /usr/bin/clang-15 /usr/bin/clang
-        sudo ln -s /usr/bin/clang++-15 /usr/bin/clang++
-        sudo ln -s /usr/bin/llvm-profdata-15 /usr/bin/llvm-profdata
-        sudo ln -s /usr/bin/llvm-cov-15 /usr/bin/llvm-cov
+        sudo ln -s /usr/bin/clang-$(llvmVersion) /usr/bin/clang
+        sudo ln -s /usr/bin/clang++-$(llvmVersion) /usr/bin/clang++
+        sudo ln -s /usr/bin/llvm-profdata-$(llvmVersion) /usr/bin/llvm-profdata
+        sudo ln -s /usr/bin/llvm-cov-$(llvmVersion) /usr/bin/llvm-cov
       displayName: "Configure Compiler Version"
 
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
+        code_coverage: $(coverage)
