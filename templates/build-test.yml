@@ -52,7 +52,7 @@ steps:
   displayName: 'Publish Build Artifacts'
   artifact: $(Agent.JobName)
 
--${{ if eq(parameters.build_coverage, true) }}:
+- ${{ if eq(parameters.build_coverage, true) }}:
   - task: CMake@1
     displayName: "Collect Code Coverage"
     inputs:
