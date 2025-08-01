@@ -12,19 +12,19 @@ steps:
 - task: CMake@1
   displayName: "Configure All"
   inputs:
-    workingDirectory: '.' 
+    workingDirectory: '$(Build.SourcesDirectory)' 
     cmakeArgs: --preset ${{ parameters.preset }} -DCMAKE_TOOLCHAIN_FILE=$(VCPKG_INSTALLATION_ROOT)/scripts/buildsystems/vcpkg.cmake -B$(Build.BinariesDirectory) ${{ parameters.cmakeArgs }}
 
 - task: CMake@1
   displayName: "Build All"
   inputs:
-    workingDirectory: '.' 
+    workingDirectory: '$(Build.SourcesDirectory)' 
     cmakeArgs: --build $(Build.BinariesDirectory) 
 
 - task: CMake@1
   displayName: "Test All"
   inputs:
-    workingDirectory: '.' 
+    workingDirectory: '$(Build.SourcesDirectory)' 
     cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Report
 
 - task: PublishTestResults@2
@@ -36,30 +36,9 @@ steps:
 - task: CMake@1 
   displayName: "Install All"
   inputs:
-    workingDirectory: '.' 
+    workingDirectory: '$(Build.SourcesDirectory)' 
     cmakeArgs: --install $(Build.BinariesDirectory) --prefix $(Build.ArtifactStagingDirectory) 
 
 - publish: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Publish Build Artifacts'
   artifact: $(Agent.JobName)
-
-- ${{ if(eq(variables.coverage, true)) }}:
-  - task: CMake@1
-    displayName: "Collect Code Coverage"
-    inputs:
-      workingDirectory: '.' 
-      cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
-
-  - script: |
-      python -m pip install --upgrade pip
-      pip install lcov_cobertura
-      lcov_cobertura my-project-Coverage
-    displayName: "Convert to Coverage Report Cobertura Format"
-    workingDirectory: $(Build.BinariesDirectory)
-
-  - task: PublishCodeCoverageResults@2
-    inputs:
-      codeCoverageTool: 'Cobertura' 
-      summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
-      failIfCoverageEmpty: true
-
