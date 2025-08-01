@@ -4,6 +4,9 @@ parameters:
 - name: cmakeArgs
   type: string
   default: ''
+- name: build_coverage
+  type: boolean
+  default: false
 
 steps:
 - task: NuGetCommand@2
@@ -27,26 +30,17 @@ steps:
     workingDirectory: '.' 
     cmakeArgs: --build $(Build.BinariesDirectory) 
 
-- bash: find $(Build.BinariesDirectory) -executable -name "*test" -type f -execdir ./'{}' ';'
-  displayName: "Test All (Linux)"
-  condition: eq( variables['Agent.OS'], 'Linux' )
-
-- pwsh: |
-    $binaries = Get-ChildItem $(Build.BinariesDirectory) -Recurse -Filter *test.exe
-    foreach($binary in $binaries)
-    {
-      cd $binary.DirectoryName
-      & $binary.FullName
-    }
-  displayName: "Test All (Windows)"
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+- task: CMake@1
+  displayName: "Test All"
+  inputs:
+    workingDirectory: '.' 
+    cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Report
 
 - task: PublishTestResults@2
   displayName: "Publish Test Results"
   inputs:
     testResultsFormat: 'JUnit'
     testResultsFiles: '$(Build.BinariesDirectory)/**/*TEST-*.xml' 
-
     
 - task: CMake@1 
   displayName: "Install All"
@@ -57,3 +51,24 @@ steps:
 - publish: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Publish Build Artifacts'
   artifact: $(Agent.JobName)
+
+-${{ if eq(parameters.build_coverage, true) }}:
+  - task: CMake@1
+    displayName: "Collect Code Coverage"
+    inputs:
+      workingDirectory: '.' 
+      cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install lcov_cobertura
+      lcov_cobertura my-project-Coverage
+    displayName: "Convert to Coverage Report Cobertura Format"
+    workingDirectory: $(Build.BinariesDirectory)
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'Cobertura' 
+      summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
+      failIfCoverageEmpty: true
+

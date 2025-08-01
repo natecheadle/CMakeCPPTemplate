@@ -68,7 +68,7 @@ stages:
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
+        dependencies: 'ninja-build pkg-config'
 
     - script: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$(gccVersion) 10
@@ -84,7 +84,6 @@ stages:
     pool:
       vmImage: ubuntu-latest
 
-    
     strategy:
       matrix:
         DEBUG_15:
@@ -95,32 +94,14 @@ stages:
           llvmVersion: 15
           cmakePreset: Linux-LLVM-Release
 
+        COVERAGE_15:
+          llvmVersion: 15
+          cmakePreset: Linux-LLVM-Coverage
+
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
-
-    - script: |
-        sudo rm /usr/bin/clang
-        sudo rm /usr/bin/clang++
-        sudo ln -s /usr/bin/clang-$(llvmVersion) /usr/bin/clang
-        sudo ln -s /usr/bin/clang++-$(llvmVersion) /usr/bin/clang++
-      displayName: "Configure Compiler Version"
-
-    - template: templates/build-test.yml
-      parameters:
-        preset: $(cmakePreset)
-
-  - job: LLVM_CODE_COVERAGE
-    variables:
-    - name: CODE_COVERAGE_NAME
-      value: 'code_coverage'
-
-    steps:
-   
-    - template: templates/install-dependencies.yml
-      parameters:
-        dependencies: 'parallel ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
+        dependencies: 'ninja-build pkg-config'
 
     - script: |
         sudo rm /usr/bin/clang
@@ -133,25 +114,6 @@ stages:
         sudo ln -s /usr/bin/llvm-cov-15 /usr/bin/llvm-cov
       displayName: "Configure Compiler Version"
 
-    - script: |
-        export LLVM_PROFILE_FILE='$(CODE_COVERAGE_NAME).profraw'
-      displayName: 'Set Output File Name'
-
     - template: templates/build-test.yml
       parameters:
-        preset: Linux-LLVM-Debug
-        cmakeArgs: '-DBUILD_COVERAGE=TRUE'
-
-    - script: |
-        find $(Build.BinariesDirectory) -name "*.profraw" | xargs llvm-profdata merge -sparse -o $(CODE_COVERAGE_NAME).profdata 
-        find $(Build.ArtifactStagingDirectory) -name "*test" -o -name "*.so" | parallel --verbose --xargs -n 1 'llvm-cov export "{}" -instr-profile=$(CODE_COVERAGE_NAME).profdata -format=lcov > $(CODE_COVERAGE_NAME)_{/.}.dat'
-        export REPORTS="$(find ./ -name "code_coverage*.dat" | tr '\n' ';' | sed 's/.$//')"
-        echo "##vso[task.setvariable variable=COVERAGE_REPORTS]$REPORTS"
-      displayName: 'Compile Coverage Report'
-
-    - task: reportgenerator@5
-      displayName: 'Report Generator'
-      inputs:
-        reports: '$(COVERAGE_REPORTS)'
-        targetDir: 'coveragereport'
-        publishCodeCoverageResults: true
+        preset: $(cmakePreset)
