@@ -34,7 +34,7 @@ steps:
   displayName: "Publish Test Results"
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: '$(Build.BinariesDirectory)/**/*-Report.xml' 
+    testResultsFiles: '$(Build.BinariesDirectory)/**/*_Report.xml' 
     
 - task: CMake@1 
   displayName: "Install All"
