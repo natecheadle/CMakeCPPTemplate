@@ -19,18 +19,22 @@ stages:
         DEBUG_X86:
           arch: x86
           cmakePreset: Windows-MSVC-x86-Debug
+          coverage: false
 
         RELEASE_X86:
           arch: x86
           cmakePreset: Windows-MSVC-x86-Release
+          coverage: false
 
         DEBUG_X64:
           arch: amd64
           cmakePreset: Windows-MSVC-x64-Debug
+          coverage: false
 
         RELEASE_X64:
           arch: amd64
           cmakePreset: Windows-MSVC-x64-Release
+          coverage: false
 
     steps:
     - task: BatchScript@1
@@ -57,10 +61,12 @@ stages:
         DEBUG_14:
           gccVersion: 14
           cmakePreset: Linux-GCC-Debug
+          coverage: false
 
         RELEASE_14:
           gccVersion: 14
           cmakePreset: Linux-GCC-Release
+          coverage: false
 
     steps:
     - template: templates/install-dependencies.yml

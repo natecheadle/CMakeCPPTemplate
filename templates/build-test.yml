@@ -4,9 +4,6 @@ parameters:
 - name: cmakeArgs
   type: string
   default: ''
-- name: build_coverage
-  type: string
-  default: false
 
 steps:
 - task: NuGetAuthenticate@1
@@ -46,25 +43,23 @@ steps:
   displayName: 'Publish Build Artifacts'
   artifact: $(Agent.JobName)
 
-- task: CMake@1
-  condition: ${{ eq(parameters.build_coverage, true) }}
-  displayName: "Collect Code Coverage"
-  inputs:
-    workingDirectory: '.' 
-    cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
+- ${{ if(eq(variables.coverage, true)) }}:
+  - task: CMake@1
+    displayName: "Collect Code Coverage"
+    inputs:
+      workingDirectory: '.' 
+      cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install lcov_cobertura
-    lcov_cobertura my-project-Coverage
-  displayName: "Convert to Coverage Report Cobertura Format"
-  condition: ${{ eq(parameters.build_coverage, true) }}
-  workingDirectory: $(Build.BinariesDirectory)
+  - script: |
+      python -m pip install --upgrade pip
+      pip install lcov_cobertura
+      lcov_cobertura my-project-Coverage
+    displayName: "Convert to Coverage Report Cobertura Format"
+    workingDirectory: $(Build.BinariesDirectory)
 
-- task: PublishCodeCoverageResults@2
-  condition: ${{ eq(parameters.build_coverage, true) }}
-  inputs:
-    codeCoverageTool: 'Cobertura' 
-    summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
-    failIfCoverageEmpty: true
+  - task: PublishCodeCoverageResults@2
+    inputs:
+      codeCoverageTool: 'Cobertura' 
+      summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
+      failIfCoverageEmpty: true
 
