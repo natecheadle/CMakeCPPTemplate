@@ -5,7 +5,7 @@ parameters:
   type: string
   default: ''
 - name: build_coverage
-  type: boolean
+  type: string
   default: false
 
 steps:
