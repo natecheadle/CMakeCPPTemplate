@@ -8,9 +8,6 @@ variables:
 - name: VCPKG_BINARY_SOURCES
   value: 'clear;nuget,$(VCPKG_NUGET),readwrite'
 
-- name: GTEST_OUTPUT
-  value: 'xml:TEST-REPORT.xml'
-
 stages:
 - stage: BUILD_TEST
   jobs:
@@ -120,4 +117,4 @@ stages:
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
-        build_coverage: ${{ variables.coverage }}
+        build_coverage: $(coverage)
