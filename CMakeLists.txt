@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project(my-project)
 
+include(GenerateCoverage)
+
 if(${BUILD_COVERAGE})
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-coverage)
