@@ -120,4 +120,4 @@ stages:
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
-        code_coverage: $(coverage)
+        build_coverage: $(coverage)
