@@ -65,7 +65,7 @@ stages:
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build pkg-config lcov'
+        dependencies: 'ninja-build pkg-config lcov mono-devel'
 
     - script: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$(gccVersion) 10
@@ -101,7 +101,7 @@ stages:
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build pkg-config lcov llvm-18'
+        dependencies: 'ninja-build pkg-config lcov mono-devel llvm-18'
 
     - script: |
         sudo rm /usr/bin/clang
