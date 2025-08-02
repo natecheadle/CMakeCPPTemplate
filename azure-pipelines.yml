@@ -121,23 +121,24 @@ stages:
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
+    - task: CMake@1
+      condition: eq(variables.coverage, true)
+      displayName: "Collect Code Coverage"
+      inputs:
+        workingDirectory: '$(Build.SourcesDirectory)' 
+        cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
 
-    - ${{ if(eq(variables.coverage, true)) }}:
-      - task: CMake@1
-        displayName: "Collect Code Coverage"
-        inputs:
-          workingDirectory: '$(Build.SourcesDirectory)' 
-          cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
+    - script: |
+        python -m pip install --upgrade pip
+        pip install lcov_cobertura
+        lcov_cobertura my-project-Coverage
+      condition: eq(variables.coverage, true)
+      displayName: "Convert to Coverage Report Cobertura Format"
+      workingDirectory: $(Build.BinariesDirectory)
 
-      - script: |
-          python -m pip install --upgrade pip
-          pip install lcov_cobertura
-          lcov_cobertura my-project-Coverage
-        displayName: "Convert to Coverage Report Cobertura Format"
-        workingDirectory: $(Build.BinariesDirectory)
-
-      - task: PublishCodeCoverageResults@2
-        inputs:
-          summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
-          pathToSources: '$(Build.SourcesDirectory)'
-          failIfCoverageEmpty: true
+    - task: PublishCodeCoverageResults@2
+      condition: eq(variables.coverage, true)
+      inputs:
+        summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
+        pathToSources: '$(Build.SourcesDirectory)'
+        failIfCoverageEmpty: true
