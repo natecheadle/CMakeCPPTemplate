@@ -154,42 +154,6 @@
       "binaryDir": "${sourceDir}/out/build/MSVC/x86/Release"
     },
     {
-      "name": "MinGW",
-      "hidden": true
-    },
-    {
-      "name": "Windows-MinGW-GCC-Release",
-      "inherits": ["Windows", "GCC", "MinGW", "Release"],
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-mingw-gcc"
-      },
-      "binaryDir": "${sourceDir}/out/build/GCC/Release"
-    },
-    {
-      "name": "Windows-MinGW-GCC-Debug",
-      "inherits": ["Windows", "GCC", "MinGW", "Debug"],
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-mingw-gcc"
-      },
-      "binaryDir": "${sourceDir}/out/build/GCC/Debug"
-    },
-    {
-      "name": "Windows-MinGW-LLVM-Debug",
-      "inherits": ["Windows", "LLVM", "MinGW", "Debug"],
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-mingw-llvm"
-      },
-      "binaryDir": "${sourceDir}/out/build/LLVM/Debug"
-    },
-    {
-      "name": "Windows-MinGW-LLVM-Release",
-      "inherits": ["Windows", "LLVM", "MinGW", "Release"],
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-mingw-llvm"
-      },
-      "binaryDir": "${sourceDir}/out/build/LLVM/Release"
-    },
-    {
       "name": "Linux",
       "inherits": "Desktop-Default",
       "hidden": true,
