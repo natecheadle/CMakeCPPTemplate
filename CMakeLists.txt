@@ -4,14 +4,15 @@ project(my-project)
 
 include(GenerateCoverage)
 
+set(REPO_ROOT ${CMAKE_CURRENT_LIST_DIR})
+
 if(${BUILD_COVERAGE})
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-coverage)
     add_link_options(-coverage)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CLANG_COVERAGE_COMPILE_FLAGS
-        "-fprofile-instr-generate -fcoverage-mapping")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COVERAGE_COMPILE_FLAGS}")
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+    add_link_options(-fprofile-instr-generate -fcoverage-mapping)
   endif()
   merge_lcov_data(${PROJECT_NAME}-Coverage TARGETS "my-string-test"
                   "my-math-test")

@@ -1,4 +1,10 @@
 function(generate_lcov_data target)
+
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs LIBRARIES)
+  cmake_parse_arguments(PARSE_ARGV 1 arg "${options}" "${oneValueArgs}"
+                        "${multiValueArgs}")
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # find required tools
     find_program(LCOV lcov REQUIRED)
@@ -11,9 +17,9 @@ function(generate_lcov_data target)
       # gather data
       COMMAND ${target}
       COMMAND
-        ${LCOV} --include ${REPO_ROOT} --exclude ${REPO_ROOT}/out/ --exclude
-        ${REPO_ROOT}/*test --branch-coverage --ignore-errors mismatch
-        --directory . --capture --output-file ${CMAKE_BINARY_DIR}/${target}.info
+        ${LCOV} --include ${CMAKE_SOURCE_DIR} --exclude ${CMAKE_BINARY_DIR} --exclude
+        ${CMAKE_SOURCE_DIR}/*test --branch-coverage --ignore-errors mismatch
+        --directory ${CMAKE_SOURCE_DIR} ${LCOV_DIRS} --capture --output-file ${CMAKE_BINARY_DIR}/${target}.info
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
     add_custom_target(${target}-Coverage DEPENDS ${target}.info)
@@ -21,6 +27,10 @@ function(generate_lcov_data target)
     # find required tools
     find_program(LLVM_PROFDATA llvm-profdata REQUIRED)
     find_program(LLVM_COV llvm-cov REQUIRED)
+
+    foreach(tar ${arg_LIBRARIES})
+      list(APPEND LLVM_OBJECTS "-object" "$<TARGET_FILE:${tar}>")
+    endforeach()
 
     # add coverage target
     add_custom_command(
@@ -33,8 +43,9 @@ function(generate_lcov_data target)
               ./${target}
       COMMAND ${LLVM_PROFDATA} merge -sparse -o ${target}.profdata
               ${target}.profraw
+      COMMAND echo ${LLVM_OBJECTS}
       COMMAND
-        ${LLVM_COV} export ${target} -ignore-filename-regex=.*test.*
+        ${LLVM_COV} export ${target} ${LLVM_OBJECTS} -ignore-filename-regex=.*test.*
         -instr-profile ${target}.profdata -format=lcov >
         ${CMAKE_BINARY_DIR}/${target}.info
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

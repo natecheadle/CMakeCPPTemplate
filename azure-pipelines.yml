@@ -68,6 +68,12 @@ stages:
           cmakePreset: Linux-GCC-Release
           coverage: false
 
+        COVERAGE_14:
+          gccVersion: 14
+          cmakePreset: Linux-GCC-Coverage
+          coverage: true
+
+
     steps:
     - template: templates/install-dependencies.yml
       parameters:
@@ -82,6 +88,28 @@ stages:
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
+
+    - task: CMake@1
+      condition: eq(variables.coverage, true)
+      displayName: "Collect Code Coverage"
+      inputs:
+        workingDirectory: '$(Build.SourcesDirectory)' 
+        cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install lcov_cobertura
+        lcov_cobertura my-project-Coverage
+      condition: eq(variables.coverage, true)
+      displayName: "Convert to Coverage Report Cobertura Format"
+      workingDirectory: $(Build.BinariesDirectory)
+
+    - task: PublishCodeCoverageResults@2
+      condition: eq(variables.coverage, true)
+      inputs:
+        summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
+        pathToSources: '$(Build.SourcesDirectory)'
+        failIfCoverageEmpty: true
 
   - job: LINUX_LLVM
     pool:
@@ -121,6 +149,7 @@ stages:
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
+
     - task: CMake@1
       condition: eq(variables.coverage, true)
       displayName: "Collect Code Coverage"

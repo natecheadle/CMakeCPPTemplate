@@ -19,7 +19,7 @@ gtest_add_tests(TARGET ${PROJECT_NAME}-test)
 generate_test_report(${PROJECT_NAME}-test)
 
 if(${BUILD_COVERAGE})
-  generate_lcov_data(${PROJECT_NAME}-test)
+  generate_lcov_data(${PROJECT_NAME}-test LIBRARIES ${PROJECT_NAME})
 endif()
 
 if(WIN32)
