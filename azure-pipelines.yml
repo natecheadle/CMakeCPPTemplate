@@ -82,6 +82,7 @@ stages:
     - script: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$(gccVersion) 10
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-$(gccVersion) 10
+        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-$(gccVersion) 10
 
       displayName: "Configure Compiler Version"
 
