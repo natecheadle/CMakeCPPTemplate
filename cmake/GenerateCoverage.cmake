@@ -19,7 +19,7 @@ function(generate_lcov_data target)
       COMMAND
         ${LCOV} --include ${CMAKE_SOURCE_DIR} --exclude ${CMAKE_BINARY_DIR} --exclude
         ${CMAKE_SOURCE_DIR}/*test --branch-coverage --ignore-errors mismatch
-        --directory ${CMAKE_SOURCE_DIR} ${LCOV_DIRS} --capture --output-file ${CMAKE_BINARY_DIR}/${target}.info
+        --directory ${CMAKE_BINARY_DIR} ${LCOV_DIRS} --capture --output-file ${CMAKE_BINARY_DIR}/${target}.info
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
     add_custom_target(${target}-Coverage DEPENDS ${target}.info)
