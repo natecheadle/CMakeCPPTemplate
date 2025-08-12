@@ -47,16 +47,14 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "binaryDir": "${sourceDir}/out/build/Debug"
+      }
     },
     {
       "name": "Release",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
-      },
-      "binaryDir": "${sourceDir}/out/build/Release"
+      }
     },
     {
       "name": "MSVC",
@@ -95,47 +93,35 @@
     {
       "name": "OSX-LLVM-Debug",
       "hidden": true,
-      "inherits": [
-        "OSX",
-        "Debug",
-        "LLVM"
-      ],
+      "inherits": ["OSX", "Debug", "LLVM"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "arm64-osx-llvm"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/LLVM/Debug"
     },
     {
       "name": "OSX-LLVM-Release",
-      "inherits": [
-        "OSX",
-        "Release",
-        "LLVM"
-      ],
+      "inherits": ["OSX", "Release", "LLVM"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "arm64-osx-llvm"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/LLVM/Release"
     },
     {
       "name": "OSX-GCC-Debug",
-      "inherits": [
-        "OSX",
-        "Debug",
-        "GCC"
-      ],
+      "inherits": ["OSX", "Debug", "GCC"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "arm64-osx-gcc"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/GCC/Debug"
     },
     {
       "name": "OSX-GCC-Release",
-      "inherits": [
-        "OSX",
-        "Release",
-        "GCC"
-      ],
+      "inherits": ["OSX", "Release", "GCC"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "arm64-osx-gcc"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/GCC/Release"
     },
     {
       "name": "Windows",
@@ -149,39 +135,23 @@
     },
     {
       "name": "Windows-MSVC-x64-Debug",
-      "inherits": [
-        "Windows",
-        "MSVC",
-        "Debug",
-        "x64"
-      ]
+      "inherits": ["Windows", "MSVC", "Debug", "x64"],
+      "binaryDir": "${sourceDir}/out/build/MSVC/x64/Debug"
     },
     {
       "name": "Windows-MSVC-x64-Release",
-      "inherits": [
-        "Windows",
-        "MSVC",
-        "Release",
-        "x64"
-      ]
+      "inherits": ["Windows", "MSVC", "Release", "x64"],
+      "binaryDir": "${sourceDir}/out/build/MSVC/x64/Release"
     },
     {
       "name": "Windows-MSVC-x86-Debug",
-      "inherits": [
-        "Windows",
-        "MSVC",
-        "Debug",
-        "x86"
-      ]
+      "inherits": ["Windows", "MSVC", "Debug", "x86"],
+      "binaryDir": "${sourceDir}/out/build/MSVC/x86/Debug"
     },
     {
       "name": "Windows-MSVC-x86-Release",
-      "inherits": [
-        "Windows",
-        "MSVC",
-        "Release",
-        "x86"
-      ]
+      "inherits": ["Windows", "MSVC", "Release", "x86"],
+      "binaryDir": "${sourceDir}/out/build/MSVC/x86/Release"
     },
     {
       "name": "Linux",
@@ -194,48 +164,52 @@
       }
     },
     {
-      "name": "Linux-GCC-Debug",
-      "inherits": [
-        "Linux",
-        "Debug",
-        "GCC"
-      ],
+      "name": "Linux-GCC-Coverage",
+      "inherits": ["Linux", "Debug", "GCC", "CodeCoverage"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux-gcc"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/GCC/Coverage"
+    },
+    {
+      "name": "Linux-GCC-Debug",
+      "inherits": ["Linux", "Debug", "GCC"],
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux-gcc"
+      },
+      "binaryDir": "${sourceDir}/out/build/GCC/Debug"
     },
     {
       "name": "Linux-GCC-Release",
-      "inherits": [
-        "Linux",
-        "Release",
-        "GCC"
-      ],
+      "inherits": ["Linux", "Release", "GCC"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux-gcc"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/GCC/Release"
+    },
+    {
+      "name": "Linux-LLVM-Coverage",
+      "inherits": ["Linux", "Debug", "LLVM", "CodeCoverage"],
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux-llvm"
+      },
+      "binaryDir": "${sourceDir}/out/build/LLVM/Coverage"
     },
     {
       "name": "Linux-LLVM-Debug",
-      "inherits": [
-        "Linux",
-        "Debug",
-        "LLVM"
-      ],
+      "inherits": ["Linux", "Debug", "LLVM"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux-llvm"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/LLVM/Debug"
     },
     {
       "name": "Linux-LLVM-Release",
-      "inherits": [
-        "Linux",
-        "Release",
-        "LLVM"
-      ],
+      "inherits": ["Linux", "Release", "LLVM"],
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux-llvm"
-      }
+      },
+      "binaryDir": "${sourceDir}/out/build/LLVM/Release"
     }
   ]
 }

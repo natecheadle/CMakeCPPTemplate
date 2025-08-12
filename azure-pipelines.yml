@@ -8,32 +8,33 @@ variables:
 - name: VCPKG_BINARY_SOURCES
   value: 'clear;nuget,$(VCPKG_NUGET),readwrite'
 
-- name: GTEST_OUTPUT
-  value: 'xml:TEST-REPORT.xml'
-
 stages:
 - stage: BUILD_TEST
   jobs:
   - job: WINDOWS_MSVC
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2025
     strategy:
       matrix:
         DEBUG_X86:
           arch: x86
           cmakePreset: Windows-MSVC-x86-Debug
+          coverage: false
 
         RELEASE_X86:
           arch: x86
           cmakePreset: Windows-MSVC-x86-Release
+          coverage: false
 
         DEBUG_X64:
           arch: amd64
           cmakePreset: Windows-MSVC-x64-Debug
+          coverage: false
 
         RELEASE_X64:
           arch: amd64
           cmakePreset: Windows-MSVC-x64-Release
+          coverage: false
 
     steps:
     - task: BatchScript@1
@@ -53,26 +54,35 @@ stages:
 
   - job: LINUX_GCC
     pool:
-      vmImage: ubuntu-latest
+      vmImage: ubuntu-24.04
 
     strategy:
       matrix:
-        DEBUG_12:
-          gccVersion: 12
+        DEBUG_14:
+          gccVersion: 14
           cmakePreset: Linux-GCC-Debug
+          coverage: false
 
-        RELEASE_12:
-          gccVersion: 12
+        RELEASE_14:
+          gccVersion: 14
           cmakePreset: Linux-GCC-Release
+          coverage: false
+
+        COVERAGE_14:
+          gccVersion: 14
+          cmakePreset: Linux-GCC-Coverage
+          coverage: true
+
 
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
+        dependencies: 'ninja-build pkg-config lcov mono-devel'
 
     - script: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$(gccVersion) 10
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-$(gccVersion) 10
+        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-$(gccVersion) 10
 
       displayName: "Configure Compiler Version"
 
@@ -80,78 +90,85 @@ stages:
       parameters:
         preset: $(cmakePreset)
 
+    - task: CMake@1
+      condition: eq(variables.coverage, true)
+      displayName: "Collect Code Coverage"
+      inputs:
+        workingDirectory: '$(Build.SourcesDirectory)' 
+        cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install lcov_cobertura
+        lcov_cobertura my-project-Coverage
+      condition: eq(variables.coverage, true)
+      displayName: "Convert to Coverage Report Cobertura Format"
+      workingDirectory: $(Build.BinariesDirectory)
+
+    - task: PublishCodeCoverageResults@2
+      condition: eq(variables.coverage, true)
+      inputs:
+        summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
+        pathToSources: '$(Build.SourcesDirectory)'
+        failIfCoverageEmpty: true
+
   - job: LINUX_LLVM
     pool:
-      vmImage: ubuntu-latest
+      vmImage: ubuntu-24.04
 
-    
     strategy:
       matrix:
-        DEBUG_15:
-          llvmVersion: 15
+        DEBUG_18:
+          llvmVersion: 18
           cmakePreset: Linux-LLVM-Debug
+          coverage: false
 
-        RELEASE_15:
-          llvmVersion: 15
+        RELEASE_18:
+          llvmVersion: 18
           cmakePreset: Linux-LLVM-Release
+          coverage: false
+
+        COVERAGE_18:
+          llvmVersion: 18
+          cmakePreset: Linux-LLVM-Coverage
+          coverage: true
 
     steps:
     - template: templates/install-dependencies.yml
       parameters:
-        dependencies: 'ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
+        dependencies: 'ninja-build pkg-config lcov mono-devel llvm-18'
 
     - script: |
         sudo rm /usr/bin/clang
         sudo rm /usr/bin/clang++
         sudo ln -s /usr/bin/clang-$(llvmVersion) /usr/bin/clang
         sudo ln -s /usr/bin/clang++-$(llvmVersion) /usr/bin/clang++
+        sudo ln -s /usr/bin/llvm-profdata-$(llvmVersion) /usr/bin/llvm-profdata
+        sudo ln -s /usr/bin/llvm-cov-$(llvmVersion) /usr/bin/llvm-cov
       displayName: "Configure Compiler Version"
 
     - template: templates/build-test.yml
       parameters:
         preset: $(cmakePreset)
 
-  - job: LLVM_CODE_COVERAGE
-    variables:
-    - name: CODE_COVERAGE_NAME
-      value: 'code_coverage'
-
-    steps:
-   
-    - template: templates/install-dependencies.yml
-      parameters:
-        dependencies: 'parallel ninja-build libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config'
-
-    - script: |
-        sudo rm /usr/bin/clang
-        sudo rm /usr/bin/clang++
-        sudo rm /usr/bin/llvm-profdata
-        sudo rm /usr/bin/llvm-cov
-        sudo ln -s /usr/bin/clang-15 /usr/bin/clang
-        sudo ln -s /usr/bin/clang++-15 /usr/bin/clang++
-        sudo ln -s /usr/bin/llvm-profdata-15 /usr/bin/llvm-profdata
-        sudo ln -s /usr/bin/llvm-cov-15 /usr/bin/llvm-cov
-      displayName: "Configure Compiler Version"
-
-    - script: |
-        export LLVM_PROFILE_FILE='$(CODE_COVERAGE_NAME).profraw'
-      displayName: 'Set Output File Name'
-
-    - template: templates/build-test.yml
-      parameters:
-        preset: Linux-LLVM-Debug
-        cmakeArgs: '-DBUILD_COVERAGE=TRUE'
-
-    - script: |
-        find $(Build.BinariesDirectory) -name "*.profraw" | xargs llvm-profdata merge -sparse -o $(CODE_COVERAGE_NAME).profdata 
-        find $(Build.ArtifactStagingDirectory) -name "*test" -o -name "*.so" | parallel --verbose --xargs -n 1 'llvm-cov export "{}" -instr-profile=$(CODE_COVERAGE_NAME).profdata -format=lcov > $(CODE_COVERAGE_NAME)_{/.}.dat'
-        export REPORTS="$(find ./ -name "code_coverage*.dat" | tr '\n' ';' | sed 's/.$//')"
-        echo "##vso[task.setvariable variable=COVERAGE_REPORTS]$REPORTS"
-      displayName: 'Compile Coverage Report'
-
-    - task: reportgenerator@5
-      displayName: 'Report Generator'
+    - task: CMake@1
+      condition: eq(variables.coverage, true)
+      displayName: "Collect Code Coverage"
       inputs:
-        reports: '$(COVERAGE_REPORTS)'
-        targetDir: 'coveragereport'
-        publishCodeCoverageResults: true
+        workingDirectory: '$(Build.SourcesDirectory)' 
+        cmakeArgs: --build $(Build.BinariesDirectory) --target my-project-Coverage
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install lcov_cobertura
+        lcov_cobertura my-project-Coverage
+      condition: eq(variables.coverage, true)
+      displayName: "Convert to Coverage Report Cobertura Format"
+      workingDirectory: $(Build.BinariesDirectory)
+
+    - task: PublishCodeCoverageResults@2
+      condition: eq(variables.coverage, true)
+      inputs:
+        summaryFileLocation: $(Build.BinariesDirectory)/coverage.xml
+        pathToSources: '$(Build.SourcesDirectory)'
+        failIfCoverageEmpty: true
