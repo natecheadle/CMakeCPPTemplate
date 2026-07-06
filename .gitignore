@@ -39,7 +39,6 @@
 # IDE Files and Folders
 compile_commands.json
 .vs
-.vscode
 .cache
 .idea
 

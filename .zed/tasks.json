@@ -1,0 +1,10 @@
+[
+  {
+    "label": "CMake GCC Configure & Build",
+    "command": "cmake --preset Linux-GCC-Debug -B out/ && cmake --build out"
+  },
+  {
+    "label": "CTest GCC",
+    "command": "ctest --test-dir out"
+  }
+]

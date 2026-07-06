@@ -1,0 +1,32 @@
+{
+  "name": "Ubuntu 26 - LLVM 22 Environment",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": "../..",
+    "args": {
+      "TOOLCHAIN": "llvm",
+      "VERSION": "22"
+    }
+  },
+  "remoteUser": "ubuntu",
+  "containerEnv": {
+    "CC": "/usr/bin/clang",
+    "CXX": "/usr/bin/clang++"
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder}/../main,target=/workspaces/CMakeCPPTemplate/main,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "cmake.ctest.testExplorerIntegrationEnabled": false
+      },
+      "extensions": [
+        "vadimcn.vscode-lldb",
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "matepek.vscode-catch2-test-adapter"
+      ]
+    }
+  }
+}
