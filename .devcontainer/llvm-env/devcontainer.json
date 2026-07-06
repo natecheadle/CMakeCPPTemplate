@@ -1,6 +1,6 @@
 {
   "name": "Ubuntu 26 - LLVM 22 Environment",
-  "image": "ghcr.io/natecheadle/cmakecpptemplate/dev-env-llvm-22:latest",
+  "image": "ghcr.io/natecheadle/dev-env-llvm-22:latest",
   // "build": {
   //   "dockerfile": "../Dockerfile",
   //   "context": "../..",

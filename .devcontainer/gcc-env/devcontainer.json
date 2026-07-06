@@ -1,6 +1,6 @@
 {
   "name": "Ubuntu 26 - GCC 16 Environment",
-  "image": "ghcr.io/natecheadle/cmakecpptemplate/dev-env-gcc-16:latest",
+  "image": "ghcr.io/natecheadle/dev-env-gcc-16:latest",
   // "build": {
   //   "dockerfile": "../Dockerfile",
   //   "context": "../..",
