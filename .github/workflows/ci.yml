@@ -183,6 +183,8 @@ jobs:
   docker-ci:
     name: Build & Register Dev Containers
     runs-on: ubuntu-24.04
+    env:
+      IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/dev-env
     strategy:
       matrix:
         include:
@@ -210,12 +212,12 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ghcr.io/${{ github.repository }}/dev-env-${{matrix.compiler}}-${{matrix.version}}
+          images: ${{ env.IMAGE_BASE }}-${{ matrix.compiler }}-${{ matrix.version }}
           tags: |
-            type=ref,event=branch,prefix=${{ matrix.version }}-
-            type=ref,event=pr,prefix=${{ matrix.version }}-
-            type=sha,format=short,prefix=${{ matrix.version }}-
-            type=raw,value=${{matrix.version}},enable=,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,format=short
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
           labels: |
             org.opencontainers.image.title=Development Environment (${{ matrix.compiler }} flavor)
             org.opencontainers.image.compiler.flavor=${{ matrix.compiler }}
