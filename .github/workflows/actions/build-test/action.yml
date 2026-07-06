@@ -1,0 +1,54 @@
+name: 'Build and Test C++'
+description: 'Configures, builds, and runs tests via CMake with native API vcpkg caching'
+inputs:
+  preset:
+    description: 'CMake preset name'
+    required: true
+  cmakeArgs:
+    description: 'Extra CMake arguments'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    # Exposes GitHub's native runtime token so vcpkg can talk to the cache API directly
+    - name: Export GitHub Actions Cache API Credentials
+      uses: actions/github-script@v9
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+    - name: Configure All
+      shell: bash
+      run: |
+        cmake --preset ${{ inputs.preset }} \
+        -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+        -B build ${{ inputs.cmakeArgs }}
+
+    - name: Build All
+      shell: bash
+      run: cmake --build build
+
+    - name: Test All
+      shell: bash
+      run: cmake --build build --target my-project-Report
+
+    - name: Archive Raw Test Results
+      uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: test-results-${{ inputs.preset }}
+        path: 'build/**/*_Report.xml'
+        if-no-files-found: ignore
+
+    - name: Install All
+      shell: bash
+      run: cmake --install build --prefix install_dist
+
+    - name: Publish Build Artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ github.job }}-${{ inputs.preset }}
+        path: install_dist/

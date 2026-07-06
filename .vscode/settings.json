@@ -1,0 +1,16 @@
+{
+  "dev.containers.attachTimeout": 120,
+  "remote.SSH.connectTimeout": 120,
+  "remote.containers.initTimeout": 120,
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  }
+}

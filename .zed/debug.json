@@ -1,0 +1,16 @@
+[
+  {
+    "label": "Debug GCC my-app",
+    "build": {
+      "command": "cmake",
+      "args": [
+        "--build",
+        "out"
+      ],
+      "cwd": "$ZED_WORKTREE_ROOT"
+    },
+    "program": "$ZED_WORKTREE_ROOT/out/app/my-app",
+    "request": "launch",
+    "adapter": "CodeLLDB"
+  }
+]
