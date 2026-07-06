@@ -1,13 +1,14 @@
 {
   "name": "Ubuntu 26 - GCC 16 Environment",
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "context": "../..",
-    "args": {
-      "TOOLCHAIN": "gcc",
-      "VERSION": "16"
-    }
-  },
+  "image": "ghcr.io/natecheadle/cmakecpptemplate/dev-env-gcc-16:16-a57260e",
+  // "build": {
+  //   "dockerfile": "../Dockerfile",
+  //   "context": "../..",
+  //   "args": {
+  //     "TOOLCHAIN": "gcc",
+  //     "VERSION": "16"
+  //   }
+  // },
   "remoteUser": "ubuntu",
   "containerEnv": {
     "CC": "/usr/bin/gcc",
