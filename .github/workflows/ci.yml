@@ -1,0 +1,292 @@
+
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read      
+  checks: write       
+  pull-requests: write 
+  packages: write
+
+env:
+  VCPKG_BINARY_SOURCES: 'clear;x-gha,readwrite'
+
+jobs:
+  windows-msvc:
+    runs-on: windows-2025
+    strategy:
+      matrix:
+        include:
+          - arch: x86
+            cmakePreset: Windows-MSVC-x86-Debug
+            coverage: false
+          - arch: x86
+            cmakePreset: Windows-MSVC-x86-Release
+            coverage: false
+          - arch: amd64
+            cmakePreset: Windows-MSVC-x64-Debug
+            coverage: false
+          - arch: amd64
+            cmakePreset: Windows-MSVC-x64-Release
+            coverage: false
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Initialize Visual Studio Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Install Dependencies
+        run: choco install ninja
+
+      - name: Build and Test
+        uses: ./.github/workflows/actions/build-test
+        with:
+          preset: ${{ matrix.cmakePreset }}
+
+  linux-gcc:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - gccVersion: 14
+            cmakePreset: Linux-GCC-Debug
+            coverage: false
+          - gccVersion: 14
+            cmakePreset: Linux-GCC-Release
+            coverage: false
+          - gccVersion: 14
+            cmakePreset: Linux-GCC-Coverage
+            coverage: true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Install Dependencies
+        uses: ./.github/workflows/actions/install-dependencies
+        with:
+          dependencies: 'ninja-build pkg-config lcov mono-devel'
+
+      - name: Configure Compiler Version
+        run: |
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gccVersion }} 10
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${{ matrix.gccVersion }} 10
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${{ matrix.gccVersion }} 10
+
+      - name: Build and Test
+        uses: ./.github/workflows/actions/build-test
+        with:
+          preset: ${{ matrix.cmakePreset }}
+
+      - name: Collect Code Coverage
+        if: matrix.coverage == true
+        run: cmake --build build --target my-project-Coverage
+
+      - name: Convert to Coverage Report Cobertura Format
+        if: matrix.coverage == true
+        run: |
+          python -m pip install --upgrade pip
+          pip install lcov_cobertura
+          lcov_cobertura my-project-Coverage
+        working-directory: build
+
+      - name: Archive Raw Coverage Results
+        if: matrix.coverage == true
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-results-${{ matrix.cmakePreset }}
+          path: build/coverage.xml
+
+  linux-llvm:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - llvmVersion: 18
+            cmakePreset: Linux-LLVM-Debug
+            coverage: false
+          - llvmVersion: 18
+            cmakePreset: Linux-LLVM-Release
+            coverage: false
+          - llvmVersion: 18
+            cmakePreset: Linux-LLVM-Coverage
+            coverage: true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Install Dependencies
+        uses: ./.github/workflows/actions/install-dependencies
+        with:
+          dependencies: 'ninja-build pkg-config lcov mono-devel llvm-${{ matrix.llvmVersion }}'
+
+      - name: Configure Compiler Version
+        run: |
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${{ matrix.llvmVersion }} 100 \
+            --slave /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-${{ matrix.llvmVersion }} \
+            --slave /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${{ matrix.llvmVersion }}
+          
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${{ matrix.llvmVersion }} 100
+
+          sudo update-alternatives --set clang /usr/bin/clang-${{ matrix.llvmVersion }}
+          sudo update-alternatives --set clang++ /usr/bin/clang++-${{ matrix.llvmVersion }}
+
+      - name: Build and Test
+        uses: ./.github/workflows/actions/build-test
+        with:
+          preset: ${{ matrix.cmakePreset }}
+
+      - name: Collect Code Coverage
+        if: matrix.coverage == true
+        run: cmake --build build --target my-project-Coverage
+
+      - name: Convert to Coverage Report Cobertura Format
+        if: matrix.coverage == true
+        run: |
+          python -m pip install --upgrade pip
+          pip install lcov_cobertura
+          lcov_cobertura my-project-Coverage
+        working-directory: build
+
+      - name: Archive Raw Coverage Results
+        if: matrix.coverage == true
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-results-${{ matrix.cmakePreset }}
+          path: build/coverage.xml
+
+  lint-format:
+    name: Code Formatting Check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Install Clang-Format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-18
+
+      - name: Run Format Validation
+        run: |
+          find . -type f -name "*.cpp" -o -name "*.h" -o -name "*.hpp" | xargs clang-format-18 --dry-run --Werror
+
+  docker-ci:
+    name: Build & Register Dev Containers
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - compiler: gcc
+            preset: Linux-GCC-Debug
+            version: "16"
+          - compiler: llvm
+            preset: Linux-LLVM-Debug
+            version: "22"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}/dev-env-${{matrix.compiler}}-${{matrix.version}}
+          tags: |
+            type=ref,event=branch,prefix=${{ matrix.version }}-
+            type=ref,event=pr,prefix=${{ matrix.version }}-
+            type=sha,format=short,prefix=${{ matrix.version }}-
+            type=raw,value=${{matrix.version}},enable=,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+          labels: |
+            org.opencontainers.image.title=Development Environment (${{ matrix.compiler }} flavor)
+            org.opencontainers.image.compiler.flavor=${{ matrix.compiler }}
+            org.opencontainers.image.compiler.version=${{ matrix.version }}
+
+      - name: Build and Validate Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./.devcontainer/Dockerfile 
+          load: true 
+          build-args: |
+            TOOLCHAIN=${{matrix.compiler}}
+            VERSION=${{matrix.version}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{matrix.compiler}}-${{matrix.version}}
+          cache-to: type=gha,mode=max,scope=${{matrix.compiler}}-${{matrix.version}}
+
+      - name: Test Repo Build/Test Inside the Container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            ${{ fromJson(steps.meta.outputs.json).tags[0] }} \
+            bash -c "cmake --preset ${{matrix.preset}} -B /home/ubuntu/build && cmake --build /home/ubuntu/build && cmake --build /home/ubuntu/build --target my-project-Report"
+
+      - name: Push Verified Container to Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./.devcontainer/Dockerfile
+          push: true
+          build-args: |
+            TOOLCHAIN=${{matrix.compiler}}
+            VERSION=${{matrix.version}}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=${{matrix.compiler}}-${{matrix.version}}
+
+  publish-results:
+    name: Public Test & Coverage Summary
+    runs-on: ubuntu-24.04
+    if: always() 
+    needs: [windows-msvc, linux-gcc, linux-llvm] 
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Download All Test Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-results-*
+          path: gathered-results
+
+      - name: Download Coverage Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: coverage-results-*
+          path: gathered-coverage
+
+      - name: Publish Consolidated Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: 'gathered-results/**/*.xml'
+          check_name: "Unit Test Suite Results"
+          comment_mode: "changes"
+
+      - name: Upload Consolidated Coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          directory: gathered-coverage/
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true

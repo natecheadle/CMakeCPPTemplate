@@ -1,0 +1,16 @@
+name: 'Install Dependencies'
+description: 'Runs apt update and installs packages'
+inputs:
+  dependencies:
+    description: 'Space separated list of packages'
+    required: true
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Apt Install
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt install -y ${{ inputs.dependencies }}
