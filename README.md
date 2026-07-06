@@ -1,3 +1,7 @@
+[![Build and Test](https://github.com/natecheadle/CMakeCPPTemplate/actions/workflows/ci.yml/badge.svg)](https://github.com/natecheadle/CMakeCPPTemplate/actions/workflows/ci.yml)
+
+[![codecov](https://codecov.io/gh/natecheadle/CMakeCPPTemplate/graph/badge.svg?token=XY5QkDOfyX)](https://codecov.io/gh/natecheadle/CMakeCPPTemplate)
+
 # Introduction
 This is a template project for starting a new cmake project. 
 

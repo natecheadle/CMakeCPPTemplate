@@ -1,13 +1,14 @@
 {
   "name": "Ubuntu 26 - LLVM 22 Environment",
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "context": "../..",
-    "args": {
-      "TOOLCHAIN": "llvm",
-      "VERSION": "22"
-    }
-  },
+  "image": "ghcr.io/natecheadle/cmakecpptemplate/dev-env-llvm-22:latest",
+  // "build": {
+  //   "dockerfile": "../Dockerfile",
+  //   "context": "../..",
+  //   "args": {
+  //     "TOOLCHAIN": "llvm",
+  //     "VERSION": "22"
+  //   }
+  // },
   "remoteUser": "ubuntu",
   "containerEnv": {
     "CC": "/usr/bin/clang",
