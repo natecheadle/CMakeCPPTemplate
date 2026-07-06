@@ -15,7 +15,7 @@
     "CXX": "/usr/bin/g++"
   },
   "mounts": [
-    "source=${localWorkspaceFolder}/../main,target=/workspaces/CMakeCPPTemplate/main,type=bind"
+    "source=${localWorkspaceFolder}/../main,target=/workspaces/main,type=bind"
   ],
   "customizations": {
     "vscode": {
