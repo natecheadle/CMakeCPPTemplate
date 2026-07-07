@@ -20,6 +20,7 @@ env:
 
 jobs:
   windows-msvc:
+    name: Build and Test Windows MSVC
     runs-on: windows-2025
     strategy:
       matrix:
@@ -54,6 +55,7 @@ jobs:
           preset: ${{ matrix.cmakePreset }}
 
   linux-gcc:
+    name: Build and Test Linux GCC 
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -107,6 +109,7 @@ jobs:
           path: build/coverage.xml
 
   linux-llvm:
+    name: Build and Test Linux LLVM
     runs-on: ubuntu-24.04
     strategy:
       matrix:
