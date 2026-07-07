@@ -15,7 +15,7 @@
     "CXX": "/usr/bin/g++"
   },
   "mounts": [
-    "source=${localWorkspaceFolder}/../main,target=/workspaces/main,type=bind"
+    "source=${localWorkspaceFolder}/../main/.git,target=/workspaces/main/.git,type=bind,consistency=cached"
   ],
   "customizations": {
     "vscode": {
